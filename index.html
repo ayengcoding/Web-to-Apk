@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>WebToAPK Documentation — Native Android App Generator</title>
+	<meta name="description" content="Official documentation for WebToAPK Studio. Learn how to convert websites into Android APKs, configure push notifications, biometric auth, offline caching, and release keystores." />
+
+	<!-- Favicon -->
+	<link rel="icon" type="image/png" href="logo.png" />
+
+	<!-- Fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+	<style>
+		:root {
+			--doc-bg: #0b0f19;
+			--doc-sidebar-bg: #0d121f;
+			--doc-card-bg: #111827;
+			--doc-border: #1f293d;
+			--doc-text: #f8fafc;
+			--doc-text-muted: #94a3b8;
+			--doc-accent: #f97316;
+			--doc-accent-hover: #ea580c;
+			--doc-accent-light: rgba(249, 115, 22, 0.12);
+			--doc-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+			--doc-mono: 'JetBrains Mono', monospace;
+			--doc-radius: 12px;
+		}
+
+		[data-theme="light"] {
+			--doc-bg: #f8fafc;
+			--doc-sidebar-bg: #ffffff;
+			--doc-card-bg: #ffffff;
+			--doc-border: #e2e8f0;
+			--doc-text: #0f172a;
+			--doc-text-muted: #64748b;
+			--doc-accent-light: rgba(249, 115, 22, 0.08);
+		}
+
+		*, *::before, *::after {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: var(--doc-font);
+			background-color: var(--doc-bg);
+			color: var(--doc-text);
+			line-height: 1.65;
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+			-webkit-font-smoothing: antialiased;
+		}
+
+		/* Top Navigation Bar */
+		.doc-navbar {
+			position: sticky;
+			top: 0;
+			z-index: 100;
+			background: var(--doc-sidebar-bg);
+			border-bottom: 1px solid var(--doc-border);
+			padding: 0.75rem 2rem;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			backdrop-filter: blur(12px);
+		}
+		.doc-brand {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			text-decoration: none;
+			color: var(--doc-text);
+			font-weight: 800;
+			font-size: 1.25rem;
+		}
+		.doc-brand img {
+			width: 36px;
+			height: 36px;
+			border-radius: 8px;
+			object-fit: contain;
+		}
+		.doc-version-badge {
+			font-size: 0.75rem;
+			padding: 0.15rem 0.5rem;
+			background: var(--doc-accent-light);
+			color: var(--doc-accent);
+			border-radius: 6px;
+			font-weight: 700;
+		}
+
+		.doc-nav-search {
+			flex: 1;
+			max-width: 420px;
+			margin: 0 2rem;
+			position: relative;
+		}
+		.doc-search-input {
+			width: 100%;
+			background: var(--doc-card-bg);
+			border: 1px solid var(--doc-border);
+			border-radius: 8px;
+			padding: 0.5rem 1rem 0.5rem 2.5rem;
+			color: var(--doc-text);
+			font-size: 0.9rem;
+			font-family: inherit;
+			outline: none;
+			transition: border-color 0.2s;
+		}
+		.doc-search-input:focus {
+			border-color: var(--doc-accent);
+		}
+		.doc-search-icon {
+			position: absolute;
+			left: 0.75rem;
+			top: 50%;
+			transform: translateY(-50%);
+			color: var(--doc-text-muted);
+		}
+		.doc-search-key {
+			position: absolute;
+			right: 0.75rem;
+			top: 50%;
+			transform: translateY(-50%);
+			font-size: 0.75rem;
+			color: var(--doc-text-muted);
+			background: var(--doc-bg);
+			border: 1px solid var(--doc-border);
+			padding: 0.1rem 0.35rem;
+			border-radius: 4px;
+		}
+
+		.doc-nav-actions {
+			display: flex;
+			align-items: center;
+			gap: 1.25rem;
+		}
+		.doc-nav-link {
+			color: var(--doc-text-muted);
+			text-decoration: none;
+			font-size: 0.9rem;
+			font-weight: 600;
+			transition: color 0.2s;
+			display: flex;
+			align-items: center;
+			gap: 0.4rem;
+		}
+		.doc-nav-link:hover {
+			color: var(--doc-accent);
+		}
+		.doc-theme-btn {
+			background: transparent;
+			border: 1px solid var(--doc-border);
+			color: var(--doc-text);
+			border-radius: 8px;
+			width: 36px;
+			height: 36px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+		}
+
+		/* Main Layout: Sidebar & Content */
+		.doc-layout {
+			display: flex;
+			flex: 1;
+			width: 100%;
+			max-width: 1440px;
+			margin: 0 auto;
+		}
+
+		/* Sidebar */
+		.doc-sidebar {
+			width: 280px;
+			flex-shrink: 0;
+			background: var(--doc-sidebar-bg);
+			border-right: 1px solid var(--doc-border);
+			padding: 2rem 1.25rem 4rem;
+			height: calc(100vh - 65px);
+			position: sticky;
+			top: 65px;
+			overflow-y: auto;
+		}
+		.doc-nav-group {
+			margin-bottom: 2rem;
+		}
+		.doc-group-title {
+			font-size: 0.75rem;
+			font-weight: 800;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--doc-text-muted);
+			margin-bottom: 0.75rem;
+			padding-left: 0.75rem;
+		}
+		.doc-nav-items {
+			list-style: none;
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+		}
+		.doc-item-link {
+			display: flex;
+			align-items: center;
+			gap: 0.65rem;
+			padding: 0.55rem 0.75rem;
+			border-radius: 8px;
+			color: var(--doc-text);
+			text-decoration: none;
+			font-size: 0.92rem;
+			font-weight: 500;
+			transition: all 0.2s;
+		}
+		.doc-item-link:hover {
+			background: var(--doc-accent-light);
+			color: var(--doc-accent);
+		}
+		.doc-item-link.active {
+			background: var(--doc-accent);
+			color: #ffffff;
+			font-weight: 700;
+		}
+
+		/* Article Body Content */
+		.doc-content {
+			flex: 1;
+			min-width: 0;
+			padding: 3rem 4rem 6rem;
+			max-width: 900px;
+		}
+		.doc-pill-category {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.4rem;
+			color: var(--doc-accent);
+			font-weight: 700;
+			font-size: 0.85rem;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			margin-bottom: 0.75rem;
+		}
+		.doc-main-heading {
+			font-size: 2.75rem;
+			font-weight: 800;
+			letter-spacing: -0.03em;
+			line-height: 1.15;
+			margin-bottom: 1rem;
+		}
+		.doc-lead-para {
+			font-size: 1.2rem;
+			color: var(--doc-text-muted);
+			margin-bottom: 2.5rem;
+			line-height: 1.6;
+		}
+
+		.doc-section {
+			margin-bottom: 3.5rem;
+			scroll-margin-top: 5rem;
+		}
+		.doc-section h2 {
+			font-size: 1.75rem;
+			font-weight: 800;
+			letter-spacing: -0.02em;
+			margin-bottom: 1rem;
+			padding-bottom: 0.5rem;
+			border-bottom: 1px solid var(--doc-border);
+		}
+		.doc-section h3 {
+			font-size: 1.3rem;
+			font-weight: 700;
+			margin: 1.75rem 0 0.75rem;
+		}
+		.doc-section p {
+			margin-bottom: 1.25rem;
+			color: var(--doc-text-muted);
+		}
+
+		/* Feature Cards Grid (Like CinePro introduction) */
+		.doc-cards-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+			gap: 1.25rem;
+			margin: 1.5rem 0 2rem;
+		}
+		.doc-card {
+			background: var(--doc-card-bg);
+			border: 1px solid var(--doc-border);
+			border-radius: var(--doc-radius);
+			padding: 1.5rem;
+			transition: all 0.2s ease;
+		}
+		.doc-card:hover {
+			border-color: var(--doc-accent);
+			transform: translateY(-2px);
+		}
+		.doc-card-icon {
+			width: 40px;
+			height: 40px;
+			border-radius: 10px;
+			background: var(--doc-accent-light);
+			color: var(--doc-accent);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-bottom: 1rem;
+		}
+		.doc-card-title {
+			font-size: 1.1rem;
+			font-weight: 700;
+			margin-bottom: 0.5rem;
+			color: var(--doc-text);
+		}
+		.doc-card-desc {
+			font-size: 0.88rem;
+			color: var(--doc-text-muted);
+			line-height: 1.5;
+			margin: 0;
+		}
+
+		/* Code Blocks */
+		.doc-code-block {
+			background: #090d16;
+			border: 1px solid var(--doc-border);
+			border-radius: var(--doc-radius);
+			margin: 1.5rem 0;
+			overflow: hidden;
+		}
+		.doc-code-header {
+			background: rgba(255, 255, 255, 0.03);
+			padding: 0.6rem 1rem;
+			border-bottom: 1px solid var(--doc-border);
+			font-size: 0.8rem;
+			color: var(--doc-text-muted);
+			font-family: var(--doc-mono);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		.doc-code-content {
+			padding: 1.25rem;
+			overflow-x: auto;
+			font-family: var(--doc-mono);
+			font-size: 0.9rem;
+			color: #38bdf8;
+			line-height: 1.6;
+		}
+
+		/* Steps list */
+		.doc-steps-list {
+			list-style: none;
+			counter-reset: doc-step;
+			display: flex;
+			flex-direction: column;
+			gap: 1.5rem;
+			margin: 1.5rem 0;
+		}
+		.doc-step-item {
+			position: relative;
+			padding-left: 3rem;
+		}
+		.doc-step-item::before {
+			counter-increment: doc-step;
+			content: counter(doc-step);
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 2rem;
+			height: 2rem;
+			border-radius: 50%;
+			background: var(--doc-accent);
+			color: #fff;
+			font-weight: 800;
+			font-size: 0.85rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		.doc-step-title {
+			font-size: 1.15rem;
+			font-weight: 700;
+			margin-bottom: 0.35rem;
+			color: var(--doc-text);
+		}
+
+		/* Alert Callouts */
+		.doc-alert {
+			border-left: 4px solid var(--doc-accent);
+			background: var(--doc-accent-light);
+			padding: 1.25rem;
+			border-radius: 0 var(--doc-radius) var(--doc-radius) 0;
+			margin: 1.75rem 0;
+			font-size: 0.95rem;
+		}
+		.doc-alert strong {
+			color: var(--doc-accent);
+		}
+
+		/* Responsive */
+		@media (max-width: 900px) {
+			.doc-layout {
+				flex-direction: column;
+			}
+			.doc-sidebar {
+				width: 100%;
+				height: auto;
+				position: relative;
+				top: 0;
+				border-right: none;
+				border-bottom: 1px solid var(--doc-border);
+				padding: 1.5rem;
+			}
+			.doc-content {
+				padding: 2rem 1.5rem;
+			}
+			.doc-main-heading {
+				font-size: 2.1rem;
+			}
+		}
+	</style>
+</head>
+<body>
+
+	<!-- Top Navigation -->
+	<header class="doc-navbar">
+		<div style="display: flex; align-items: center; gap: 1rem;">
+			<a href="index.html" class="doc-brand">
+				<img src="logo.png" alt="WebToAPK Logo" />
+				<span>WebToAPK</span>
+			</a>
+			<span class="doc-version-badge">v2.4.0 Core</span>
+		</div>
+
+		<div class="doc-nav-search">
+			<svg class="doc-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+			<input type="text" id="docSearch" class="doc-search-input" placeholder="Search documentation, API, features..." />
+			<span class="doc-search-key">Ctrl K</span>
+		</div>
+
+		<div class="doc-nav-actions">
+			<a href="https://webtoapk-cqc.pages.dev" target="_blank" rel="noopener noreferrer" class="doc-nav-link">
+				<span>WebToAPK Studio</span>
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+			</a>
+			<a href="https://github.com/ayengcoding/Web-to-Apk" target="_blank" rel="noopener noreferrer" class="doc-nav-link">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+			</a>
+			<button type="button" class="doc-theme-btn" id="docThemeBtn" title="Toggle Theme">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+			</button>
+		</div>
+	</header>
+
+	<!-- Main Documentation Layout -->
+	<div class="doc-layout">
+		
+		<!-- Sidebar Navigation (CinePro style) -->
+		<aside class="doc-sidebar">
+			<div class="doc-nav-group">
+				<div class="doc-group-title">Get Started</div>
+				<ul class="doc-nav-items">
+					<li><a href="#introduction" class="doc-item-link active">Introduction</a></li>
+					<li><a href="#quickstart" class="doc-item-link">Quickstart (3 Steps)</a></li>
+					<li><a href="#architecture" class="doc-item-link">Core Architecture</a></li>
+				</ul>
+			</div>
+
+			<div class="doc-nav-group">
+				<div class="doc-group-title">Configuration &amp; Controls</div>
+				<ul class="doc-nav-items">
+					<li><a href="#app-identity" class="doc-item-link">App Identity &amp; Package ID</a></li>
+					<li><a href="#system-bars" class="doc-item-link">Status Bar &amp; Bottom Nav</a></li>
+					<li><a href="#branding-splash" class="doc-item-link">Branding, Splash &amp; Spinners</a></li>
+					<li><a href="#hardware-permissions" class="doc-item-link">Hardware &amp; Permissions</a></li>
+				</ul>
+			</div>
+
+			<div class="doc-nav-group">
+				<div class="doc-group-title">Distribution &amp; Stores</div>
+				<ul class="doc-nav-items">
+					<li><a href="#sideloading" class="doc-item-link">Android Sideloading (QR)</a></li>
+					<li><a href="#play-store" class="doc-item-link">Google Play Preparation</a></li>
+					<li><a href="#vip-licensing" class="doc-item-link">VIP Licensing &amp; Gumroad</a></li>
+				</ul>
+			</div>
+
+			<div class="doc-nav-group">
+				<div class="doc-group-title">Troubleshooting &amp; FAQ</div>
+				<ul class="doc-nav-items">
+					<li><a href="#faq" class="doc-item-link">Common Questions</a></li>
+					<li><a href="#ssl-security" class="doc-item-link">SSL &amp; Content Security</a></li>
+				</ul>
+			</div>
+		</aside>
+
+		<!-- Article Content -->
+		<main class="doc-content">
+			
+			<div class="doc-pill-category">Get Started</div>
+			<h1 class="doc-main-heading">Introduction to WebToAPK Core</h1>
+			<p class="doc-lead-para">
+				Convert any responsive website or web application into a high-performance native Android APK with zero complex Java/Kotlin toolchains. Automated cloud runners assemble, optimize, and sign production APKs in seconds.
+			</p>
+
+			<!-- Section: What is WebToAPK? -->
+			<section class="doc-section" id="introduction">
+				<h2>What is WebToAPK Core?</h2>
+				<p>
+					WebToAPK is a turnkey conversion platform that bridges modern web technologies with native Android capabilities. Using a fortified Android WebView container, your web app operates with hardware acceleration, native push notifications, offline fallback support, biometric authentication, and persistent session cookies.
+				</p>
+				<p>
+					Any update you deploy to your website updates inside the mobile application immediately—no repeated app store recompilations or lengthy review queues for regular web design iterations.
+				</p>
+
+				<!-- 4 Pillar Feature Cards (Matching CinePro) -->
+				<div class="doc-cards-grid">
+					<div class="doc-card">
+						<div class="doc-card-icon">
+							<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+						</div>
+						<h3 class="doc-card-title">Automated Cloud Compilers</h3>
+						<p class="doc-card-desc">Serverless build pipelines build and debug-sign native Android APKs in ~30 seconds.</p>
+					</div>
+
+					<div class="doc-card">
+						<div class="doc-card-icon">
+							<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+						</div>
+						<h3 class="doc-card-title">Interactive Device Preview</h3>
+						<p class="doc-card-desc">Test real-time Android status bar colors, app bars, launcher icons, and web responsive layouts.</p>
+					</div>
+
+					<div class="doc-card">
+						<div class="doc-card-icon">
+							<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+						</div>
+						<h3 class="doc-card-title">Instant Sideload &amp; QR</h3>
+						<p class="doc-card-desc">Scan generated QR codes from phone cameras to download and test immediately.</p>
+					</div>
+
+					<div class="doc-card">
+						<div class="doc-card-icon">
+							<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+						</div>
+						<h3 class="doc-card-title">VIP Power Features</h3>
+						<p class="doc-card-desc">Custom package IDs, custom splash screens, animated loaders, and multi-app side-by-side installs.</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- Section: Quickstart -->
+			<section class="doc-section" id="quickstart">
+				<h2>Quickstart: Converting in 3 Steps</h2>
+				<p>You can compile and test your first Android APK without writing any Java or installing Android Studio.</p>
+
+				<ol class="doc-steps-list">
+					<li class="doc-step-item">
+						<h4 class="doc-step-title">Enter Website Target URL</h4>
+						<p>Paste your responsive website URL (e.g., <code>https://mybrand.com</code>) into the builder. The builder will automatically test URL accessibility and suggest a default app name.</p>
+					</li>
+					<li class="doc-step-item">
+						<h4 class="doc-step-title">Customize Visual Branding &amp; Toggles</h4>
+						<p>Upload a 512x512 PNG app icon, pick brand theme colors, and choose whether to display the Android Status Bar or System Navigation Bar.</p>
+					</li>
+					<li class="doc-step-item">
+						<h4 class="doc-step-title">Trigger Cloud Build &amp; Scan QR Code</h4>
+						<p>Click "Build Android APK". Watch the multi-stage compilation steps execute live. Once finished, scan the QR code with your Android phone to sideload and install.</p>
+					</li>
+				</ol>
+
+				<div class="doc-alert">
+					<strong>Note:</strong> Target websites must have a valid SSL certificate (<code>https://</code>) to satisfy Google Android WebView network security requirements.
+				</div>
+			</section>
+
+			<!-- Section: System Bars & Fullscreen -->
+			<section class="doc-section" id="system-bars">
+				<h2>Status Bar &amp; Bottom Navigation Controls</h2>
+				<p>
+					WebToAPK allows granular control over native Android system window chrome:
+				</p>
+				<ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--doc-text-muted);">
+					<li style="margin-bottom: 0.5rem;"><strong>Show Android Status Bar:</strong> Controls whether the top bar displaying battery, wifi, and time is visible. When enabled, status bar icons automatically adjust to light or dark based on your brand color luminance.</li>
+					<li style="margin-bottom: 0.5rem;"><strong>Show System Bottom Navigation Bar:</strong> Controls whether the standard Android 3-button navigation (Back, Home, Overview) is shown.</li>
+					<li style="margin-bottom: 0.5rem;"><strong>Immersive Fullscreen:</strong> Hides both the status bar and bottom navigation bar simultaneously, giving web apps 100% of the screen. System bars can still be revealed transiently by swiping from the edge.</li>
+					<li><strong>Enable All / Disable All:</strong> Quick toggle actions to turn all optional native capabilities on or off with a single click.</li>
+				</ul>
+
+				<div class="doc-code-block">
+					<div class="doc-code-header">
+						<span>Android Configuration Resource: res/values/wtapk_config.xml</span>
+						<span>XML</span>
+					</div>
+					<pre class="doc-code-content">&lt;resources&gt;
+    &lt;string name="wtapk_start_url"&gt;https://mybrand.com&lt;/string&gt;
+    &lt;color name="wtapk_status_bar"&gt;#111827&lt;/color&gt;
+    &lt;bool name="wtapk_enable_fullscreen"&gt;false&lt;/bool&gt;
+    &lt;bool name="wtapk_enable_pull_refresh"&gt;true&lt;/bool&gt;
+    &lt;bool name="wtapk_enable_downloads"&gt;true&lt;/bool&gt;
+&lt;/resources&gt;</pre>
+				</div>
+			</section>
+
+			<!-- Section: Sideloading Instructions -->
+			<section class="doc-section" id="sideloading">
+				<h2>How to Install (Sideload) on Android</h2>
+				<p>To test generated APK files directly on your device:</p>
+				<ol style="margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--doc-text-muted);">
+					<li style="margin-bottom: 0.5rem;">Download the APK from the success screen or scan the QR code with your phone.</li>
+					<li style="margin-bottom: 0.5rem;">Tap the completed download notification in Android.</li>
+					<li style="margin-bottom: 0.5rem;">If prompted by Android security: tap <strong>Settings</strong> &rarr; enable <strong>"Allow from this source"</strong> (Install unknown apps).</li>
+					<li>Return to the installer and tap <strong>Install</strong>. Your app icon will appear on your home screen launcher.</li>
+				</ol>
+			</section>
+
+			<!-- Section: VIP & Gumroad -->
+			<section class="doc-section" id="vip-licensing">
+				<h2>VIP Pass &amp; Gumroad Licensing</h2>
+				<p>
+					WebToAPK Studio offers optional VIP passes for creators and businesses requiring custom reverse-domain identifiers:
+				</p>
+				<div class="doc-cards-grid">
+					<div class="doc-card">
+						<h3 class="doc-card-title">Custom Package IDs</h3>
+						<p class="doc-card-desc">Assign your own domain namespace (e.g. <code>com.company.store</code>). Essential for publishing to Google Play Console and installing multiple apps simultaneously.</p>
+					</div>
+					<div class="doc-card">
+						<h3 class="doc-card-title">Branded Splash &amp; Spinners</h3>
+						<p class="doc-card-desc">Upload full-screen 1080x1920 splash art and choose circular spinners, bouncing dots, or custom GIF loading animations.</p>
+					</div>
+				</div>
+				<p>
+					After purchasing a pass on Gumroad, simply enter your license key on the <a href="https://webtoapk-cqc.pages.dev/account" target="_blank" style="color:var(--doc-accent);font-weight:700;">Account Page</a> or <a href="https://webtoapk-cqc.pages.dev/pricing" target="_blank" style="color:var(--doc-accent);font-weight:700;">Pricing Page</a> to activate VIP instantly.
+				</p>
+			</section>
+
+		</main>
+	</div>
+
+	<!-- Simple Script for Search & Theme Toggle -->
+	<script>
+		// Theme Toggle
+		const themeBtn = document.getElementById('docThemeBtn');
+		function toggleDocTheme() {
+			const current = document.documentElement.getAttribute('data-theme') || 'dark';
+			const next = current === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', next);
+			localStorage.setItem('wtapk_doc_theme', next);
+		}
+		if (themeBtn) themeBtn.addEventListener('click', toggleDocTheme);
+		const savedDocTheme = localStorage.getItem('wtapk_doc_theme') || 'dark';
+		document.documentElement.setAttribute('data-theme', savedDocTheme);
+
+		// Active Link Highlight on Scroll
+		const navLinks = document.querySelectorAll('.doc-item-link');
+		window.addEventListener('scroll', () => {
+			let currentSection = '';
+			document.querySelectorAll('.doc-section').forEach(section => {
+				const sectionTop = section.offsetTop - 120;
+				if (window.scrollY >= sectionTop) {
+					currentSection = section.getAttribute('id');
+				}
+			});
+			navLinks.forEach(link => {
+				link.classList.remove('active');
+				if (link.getAttribute('href') === '#' + currentSection) {
+					link.classList.add('active');
+				}
+			});
+		});
+
+		// Search Hotkey
+		document.addEventListener('keydown', (e) => {
+			if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+				e.preventDefault();
+				const search = document.getElementById('docSearch');
+				if (search) search.focus();
+			}
+		});
+	</script>
+</body>
+</html>
