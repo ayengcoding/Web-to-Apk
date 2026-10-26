@@ -261,8 +261,12 @@
 		.doc-content {
 			flex: 1;
 			min-width: 0;
-			padding: 3rem 4rem 6rem;
+			padding: 3rem 4rem 18rem;
 			max-width: 900px;
+		}
+
+		.doc-section {
+			scroll-margin-top: 90px;
 		}
 		.doc-pill-category {
 			display: inline-flex;
@@ -787,18 +791,49 @@
 
 		// Active Link Highlight on Scroll
 		const navLinks = document.querySelectorAll('.doc-item-link');
-		window.addEventListener('scroll', () => {
+		const sections = document.querySelectorAll('.doc-section');
+
+		function updateActiveSection() {
 			let currentSection = '';
-			document.querySelectorAll('.doc-section').forEach(section => {
-				const sectionTop = section.offsetTop - 120;
-				if (window.scrollY >= sectionTop) {
-					currentSection = section.getAttribute('id');
-				}
-			});
-			navLinks.forEach(link => {
-				link.classList.remove('active');
-				if (link.getAttribute('href') === '#' + currentSection) {
-					link.classList.add('active');
+			const scrollPos = window.scrollY + 140;
+			const isBottom = (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 60;
+
+			if (isBottom && sections.length > 0) {
+				currentSection = sections[sections.length - 1].getAttribute('id');
+			} else {
+				sections.forEach(section => {
+					if (section.offsetTop <= scrollPos) {
+						currentSection = section.getAttribute('id');
+					}
+				});
+			}
+
+			if (currentSection) {
+				navLinks.forEach(link => {
+					link.classList.remove('active');
+					if (link.getAttribute('href') === '#' + currentSection) {
+						link.classList.add('active');
+					}
+				});
+			}
+		}
+
+		window.addEventListener('scroll', updateActiveSection);
+		window.addEventListener('load', updateActiveSection);
+
+		// Smooth Click Navigation
+		navLinks.forEach(link => {
+			link.addEventListener('click', (e) => {
+				const targetId = link.getAttribute('href');
+				if (targetId && targetId.startsWith('#')) {
+					const targetEl = document.querySelector(targetId);
+					if (targetEl) {
+						e.preventDefault();
+						targetEl.scrollIntoView({ behavior: 'smooth' });
+						history.pushState(null, '', targetId);
+						navLinks.forEach(l => l.classList.remove('active'));
+						link.classList.add('active');
+					}
 				}
 			});
 		});
