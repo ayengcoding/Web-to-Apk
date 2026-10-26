@@ -608,6 +608,38 @@
 				</div>
 			</section>
 
+			<!-- Section: Core Architecture -->
+			<section class="doc-section" id="architecture">
+				<h2>Core Architecture &amp; Runtime Engine</h2>
+				<p>
+					WebToAPK wraps your web application inside an optimized native Android container built on Chromium WebView. It provides seamless hardware acceleration, V8 JavaScript optimization, and direct bridge access to native Android subsystem APIs.
+				</p>
+				<div class="doc-cards-grid">
+					<div class="doc-card">
+						<h3 class="doc-card-title">Native WebView Bridge</h3>
+						<p class="doc-card-desc">Bidirectional JavaScript interface supporting hardware vibration, camera prompts, geolocation, and clipboard access.</p>
+					</div>
+					<div class="doc-card">
+						<h3 class="doc-card-title">Offline Cache Engine</h3>
+						<p class="doc-card-desc">Custom asset interceptor serving offline fallback pages and caching static assets locally for instant cold starts.</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- Section: App Identity & Package ID -->
+			<section class="doc-section" id="app-identity">
+				<h2>App Identity &amp; Package Namespace (Package ID)</h2>
+				<p>
+					Every Android app requires a unique reverse-domain identifier formatted like <code>com.yourcompany.appname</code>.
+				</p>
+				<ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--doc-text-muted);">
+					<li style="margin-bottom: 0.5rem;"><strong>App Name:</strong> The label displayed underneath the icon on the Android launcher and app switcher.</li>
+					<li style="margin-bottom: 0.5rem;"><strong>Package ID:</strong> Determines how Android identifies your application on user devices and the Google Play Store.</li>
+					<li style="margin-bottom: 0.5rem;"><strong>Default Free Tier:</strong> Uses <code>com.ayengcoding.webtoapk</code>.</li>
+					<li><strong>VIP Tier:</strong> Lets you set any custom package identifier (e.g. <code>com.mybrand.store</code>), allowing multiple independent apps to be installed simultaneously.</li>
+				</ul>
+			</section>
+
 			<!-- Section: System Bars & Fullscreen -->
 			<section class="doc-section" id="system-bars">
 				<h2>Status Bar &amp; Bottom Navigation Controls</h2>
@@ -628,17 +660,45 @@
 					</div>
 					<pre class="doc-code-content">&lt;resources&gt;
     &lt;string name="wtapk_start_url"&gt;https://mybrand.com&lt;/string&gt;
-    &lt;color name="wtapk_status_bar"&gt;#111827&lt;/color&gt;
+    &lt;color name="wtapk_status_bar"&gt;#1a1e27&lt;/color&gt;
     &lt;bool name="wtapk_enable_fullscreen"&gt;false&lt;/bool&gt;
+    &lt;bool name="wtapk_show_status_bar"&gt;true&lt;/bool&gt;
+    &lt;bool name="wtapk_show_nav_bar"&gt;true&lt;/bool&gt;
     &lt;bool name="wtapk_enable_pull_refresh"&gt;true&lt;/bool&gt;
-    &lt;bool name="wtapk_enable_downloads"&gt;true&lt;/bool&gt;
 &lt;/resources&gt;</pre>
 				</div>
 			</section>
 
+			<!-- Section: Branding, Splash & Spinners -->
+			<section class="doc-section" id="branding-splash">
+				<h2>Branding, Splash Screens &amp; Spinners</h2>
+				<p>
+					Give your Android application a fully customized startup flow:
+				</p>
+				<ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--doc-text-muted);">
+					<li style="margin-bottom: 0.5rem;"><strong>App Icon:</strong> Upload a 512x512 PNG. The build pipeline automatically generates Adaptive Mipmap drawables (hdpi, xhdpi, xxhdpi, xxxhdpi) compatible with Android 8 through 14+.</li>
+					<li style="margin-bottom: 0.5rem;"><strong>Splash Screen:</strong> Displays a branded splash window while the web page initializes in the background.</li>
+					<li style="margin-bottom: 0.5rem;"><strong>Animated Loaders:</strong> Choose between Material Circular Progress, Bouncing Dots, or Minimalist Top Progress Bar.</li>
+				</ul>
+			</section>
+
+			<!-- Section: Hardware & Permissions -->
+			<section class="doc-section" id="hardware-permissions">
+				<h2>Hardware Capabilities &amp; Permissions</h2>
+				<p>
+					Toggle required hardware capabilities directly in the app generator without modifying <code>AndroidManifest.xml</code> manually:
+				</p>
+				<ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--doc-text-muted);">
+					<li style="margin-bottom: 0.5rem;"><strong>Camera &amp; Photo Picker:</strong> Enables <code>&lt;input type="file" accept="image/*"&gt;</code> file choosers with runtime permission requests.</li>
+					<li style="margin-bottom: 0.5rem;"><strong>Geolocation (GPS):</strong> Grants the browser HTML5 Geolocation API access with high-accuracy GPS polling.</li>
+					<li style="margin-bottom: 0.5rem;"><strong>Download Manager:</strong> Hooks download links directly into Android's system <code>DownloadManager</code> with background progress notifications.</li>
+					<li><strong>Biometric Unlock:</strong> Prompts Android Fingerprint or Face ID authentication before unlocking the web container.</li>
+				</ul>
+			</section>
+
 			<!-- Section: Sideloading Instructions -->
 			<section class="doc-section" id="sideloading">
-				<h2>How to Install (Sideload) on Android</h2>
+				<h2>Android Sideloading (QR Code)</h2>
 				<p>To test generated APK files directly on your device:</p>
 				<ol style="margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--doc-text-muted);">
 					<li style="margin-bottom: 0.5rem;">Download the APK from the success screen or scan the QR code with your phone.</li>
@@ -648,11 +708,24 @@
 				</ol>
 			</section>
 
+			<!-- Section: Google Play Preparation -->
+			<section class="doc-section" id="play-store">
+				<h2>Google Play Preparation &amp; Keystores</h2>
+				<p>
+					Preparing to publish to Google Play Console:
+				</p>
+				<ol style="margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--doc-text-muted);">
+					<li style="margin-bottom: 0.5rem;"><strong>Custom Package ID:</strong> Unlock VIP to set a permanent reverse-domain namespace (e.g. <code>com.mycompany.app</code>). Google Play does not allow changing package names after publishing.</li>
+					<li style="margin-bottom: 0.5rem;"><strong>Release Keystore:</strong> Sign your APK or AAB with a private RSA 2048-bit release keystore.</li>
+					<li style="margin-bottom: 0.5rem;"><strong>Target SDK Compliance:</strong> The cloud compiler targets Android API 34+ to comply with Google Play's latest requirements.</li>
+				</ol>
+			</section>
+
 			<!-- Section: VIP & Gumroad -->
 			<section class="doc-section" id="vip-licensing">
-				<h2>VIP Pass &amp; Gumroad Licensing</h2>
+				<h2>VIP Licensing &amp; Gumroad Activation</h2>
 				<p>
-					WebToAPK Studio offers optional VIP passes for creators and businesses requiring custom reverse-domain identifiers:
+					WebToAPK Studio offers VIP passes for creators and businesses requiring custom reverse-domain identifiers:
 				</p>
 				<div class="doc-cards-grid">
 					<div class="doc-card">
@@ -665,8 +738,34 @@
 					</div>
 				</div>
 				<p>
-					After purchasing a pass on Gumroad, simply enter your license key on the <a href="https://webtoapk-cqc.pages.dev/account" target="_blank" style="color:var(--doc-accent);font-weight:700;">Account Page</a> or <a href="https://webtoapk-cqc.pages.dev/pricing" target="_blank" style="color:var(--doc-accent);font-weight:700;">Pricing Page</a> to activate VIP instantly.
+					After purchasing a pass on Gumroad, enter your license key on the <a href="https://webtoapk-cqc.pages.dev/account" target="_blank" style="color:var(--doc-accent);font-weight:700;">Account Page</a> or <a href="https://webtoapk-cqc.pages.dev/pricing" target="_blank" style="color:var(--doc-accent);font-weight:700;">Pricing Page</a> to activate VIP instantly.
 				</p>
+			</section>
+
+			<!-- Section: Common Questions (FAQ) -->
+			<section class="doc-section" id="faq">
+				<h2>Frequently Asked Questions</h2>
+				<div style="display:flex;flex-direction:column;gap:1rem;margin-top:1rem;">
+					<div class="doc-card">
+						<h3 class="doc-card-title">Do I need to recompile the APK when I update my website?</h3>
+						<p class="doc-card-desc">No! Any updates, text changes, styling, or new pages published to your website appear inside the Android app instantly.</p>
+					</div>
+					<div class="doc-card">
+						<h3 class="doc-card-title">Can I install more than one app built with WebToAPK?</h3>
+						<p class="doc-card-desc">Yes! With a VIP Pass, you can set a custom Package ID for each app so Android treats them as separate applications.</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- Section: SSL & Content Security -->
+			<section class="doc-section" id="ssl-security">
+				<h2>SSL &amp; Content Security</h2>
+				<p>
+					Android 9 (API 28) and newer restrict cleartext HTTP traffic by default. All target websites converted with WebToAPK must be served over secure <strong>HTTPS</strong> with a valid SSL/TLS certificate.
+				</p>
+				<div class="doc-alert">
+					<strong>Security Tip:</strong> Mixed content (loading insecure <code>http://</code> scripts or images on an <code>https://</code> page) will be blocked by Android WebView. Ensure all site assets use HTTPS.
+				</div>
 			</section>
 
 		</main>
